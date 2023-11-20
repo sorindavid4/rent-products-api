@@ -66,7 +66,7 @@ namespace rent_products_api.ServiceLayer
                 var account = await _context.Users.SingleOrDefaultAsync(x => x.Email == model.Email);
                 var message = Messages.Message_LoggedInSuccessfully;
 
-                if (account == null  || !BC.Verify(model.Password, account.Password))
+                if (account == null  || !BC.Verify(model.Password, account.Password) || account.IsDeleted)
                     throw new AppException("Email or password is incorrect");
 
                 // authentication successful so generate jwt and refresh tokens
@@ -191,7 +191,6 @@ namespace rent_products_api.ServiceLayer
                 if (await _context.Users.AnyAsync(x => x.Email == model.Email))
                 {
                     // send already registered error in email to prevent account enumeration
-                    _emailService.SendAlreadyRegisteredEmail(model.Email, origin);
                     return new ServiceResponse<Object> { Response = (string)null, Success = false, Message = Messages.Message_EmailAlreadyUsed };
                 }
 
@@ -228,7 +227,6 @@ namespace rent_products_api.ServiceLayer
                 if (await _context.Users.AnyAsync(x => x.Email == model.Email))
                 {
                     // send already registered error in email to prevent account enumeration
-                    _emailService.SendAlreadyRegisteredEmail(model.Email, origin);
                     return new ServiceResponse<Object> { Response = (string)null, Success = false, Message = Messages.Message_EmailAlreadyUsed };
                 }
 
@@ -488,8 +486,7 @@ namespace rent_products_api.ServiceLayer
             try
             {
                 var account = await getAccount(id);
-
-                _context.Users.Remove(account);
+                account.IsDeleted = true;
                 _context.SaveChanges();
 
                 return new ServiceResponse<Object> { Response = (string)null, Success = true, Message = Messages.Message_UserDeleteSuccess };
@@ -567,6 +564,29 @@ namespace rent_products_api.ServiceLayer
             }catch(Exception e)
             {
                 return new ServiceResponse<object> { Success = false };
+            }
+        }
+
+        public async Task<ServiceResponse<IEnumerable<SimpleUserDTO>>> GetUsers()
+        {
+            try
+            {
+                var users = _context.Users.Where(x => x.UserType == UserType.SimpleUser && !x.IsDeleted).Select(x => new SimpleUserDTO
+                {
+                    UserId = x.UserId,
+                    Email = x.Email,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    CreatedAt = GenericFunctions.ParseNullableDateTimeAsDisplayableString(x.CreatedAt),
+                    Updated = GenericFunctions.ParseNullableDateTimeAsDisplayableString(x.Updated),
+                    NumarTelefon = (x as User).PhoneNumber,
+                }).AsEnumerable();
+
+                return new ServiceResponse<IEnumerable<SimpleUserDTO>> { Response = users, Success = true };
+            }
+            catch (Exception e)
+            {
+                return new ServiceResponse<IEnumerable<SimpleUserDTO>> { Success = false, Message = Messages.Message_UsersLoadError };
             }
         }
     }

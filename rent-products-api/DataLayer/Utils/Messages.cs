@@ -62,7 +62,13 @@ namespace rent_products_api.DataLayer.Utils
 
         public static Message Message_GetProductsError = new Message { Text = "Produsele nu au putut fi afisate.", MessageType = MessageType.Error };
         public static Message Message_RentProductError = new Message { Text = "Nu s-a putut inregistra inchirierea.", MessageType = MessageType.Error };
-        public static Message Message_RentProductSuccess = new Message { Text = "Inchiriere facuta cu succes.", MessageType = MessageType.Success };
+        public static Message Message_RentProductSuccess = new Message { Text = "Rezervare facuta cu succes.", MessageType = MessageType.Success };
+
+        public static Message Message_CancelRentError = new Message { Text = "Rezervarea nu a putut fi anulată.", MessageType = MessageType.Error };
+        public static Message Message_CancelRentSuccess = new Message { Text = "Rezervare anulată cu succes.", MessageType = MessageType.Success };
+
+        public static Message Message_ConfirmRentError = new Message { Text = "Rezervarea nu a putut fi confirmată.", MessageType = MessageType.Error };
+        public static Message Message_ConfirmRentSuccess = new Message { Text = "Rezervare confirmată cu succes.", MessageType = MessageType.Success };
         #endregion
 
 

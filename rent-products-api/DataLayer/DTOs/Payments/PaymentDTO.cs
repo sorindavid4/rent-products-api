@@ -1,4 +1,5 @@
-﻿using System;
+﻿using rent_products_api.DataLayer.Utils;
+using System;
 
 namespace rent_products_api.DataLayer.DTOs.Payments
 {
@@ -8,6 +9,7 @@ namespace rent_products_api.DataLayer.DTOs.Payments
         public Guid UserId { get; set; }
         public Guid RentId { get; set; }
         public string PaymentTime { get; set; }
+        public RentStatus RentStatus { get; set; }
         public string PaymentStatus { get; set; }
         public string UserPayingName { get; set; }
         public string Amount { get; set; }

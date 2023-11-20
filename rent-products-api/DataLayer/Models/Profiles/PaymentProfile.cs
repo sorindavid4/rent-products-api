@@ -14,6 +14,7 @@ namespace rent_products_api.DataLayer.Models.Profiles
                 .ForMember(x => x.PaymentTime, opt => opt.MapFrom(src => GenericFunctions.ParseNullableDateTime(src.Payment.PaymentTime)))
                 .ForMember(x => x.UserId, opt => opt.MapFrom(src => src.RentedByUserId))
                 .ForMember(x => x.PaymentStatus, opt => opt.MapFrom(src => src.Payment.PaymentStatus))
+                .ForMember(x => x.RentStatus, opt => opt.MapFrom(src => src.Status))
                 .ForMember(x => x.Amount, opt => opt.MapFrom(src => src.Payment.Amount))
                 .ForMember(x => x.UserPayingName, opt => opt.MapFrom(src => src.RentedByUser.LastName + " " + src.RentedByUser.FirstName));
         }

@@ -115,26 +115,13 @@ namespace rent_products_api.ServiceLayer.EmailService
                 html: body
             );
         }
-        public async void SendAlreadyRegisteredEmail(string email, string origin)
-        {
-            string message;
-            origin = _appSettings.MailBaseUrl;
-            var alreadyRegisteredUrl = $"{origin}/users/resetPassword";
-            message = $@"<p>Dacă ați uitat parola folositi link-ul următor pentru a o reseta <a href=""{alreadyRegisteredUrl}"">Link</a></p>";
-            var html =await GetMailTemplate("Cont existent", $@"<p>Email-ul <strong>{email}</strong> este deja înregistrat.</p>{ message}");
-            Send(
-                to: email,
-                subject: "Acest email este deja înregistrat în platformă",
-                html: html
-            );
-        }
         public async void SendPasswordResetEmail(BaseUser account, string origin)
         {
             string message;
             origin = _appSettings.MailBaseUrl;
             if (!string.IsNullOrEmpty(origin))
             {
-                var resetUrl = $"{origin}/users/ResetPassword?token={account.ResetToken}";
+                var resetUrl = $"{origin}/utilizatori/resetare-parola?token={account.ResetToken}";
                 message = $@"<p>Apăsați pe link-ul de mai jos pentru a reseta parola. Link-ul e valabil 24 de ore de la primire</p>
                              <p><a href=""{resetUrl}"">Resetează parola</a></p>";
             }

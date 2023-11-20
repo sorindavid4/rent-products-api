@@ -30,5 +30,6 @@ namespace rent_products_api.ServiceLayer.UsersService
         Task<ServiceResponse<Object>> Delete(Guid id);
         Task<ServiceResponse<Object>> SendContactEmail(ContactEmailDTO dto);
         Task<ServiceResponse<Object>> ResendVerificationEmail(string email);
+        Task<ServiceResponse<IEnumerable<SimpleUserDTO>>> GetUsers();
     }
 }

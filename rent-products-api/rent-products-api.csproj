@@ -16,6 +16,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Azure.Storage.Files.Shares" Version="12.9.0" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="FreeSpire.Office" Version="4.3.1" />
     <PackageReference Include="MailKit" Version="3.2.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.9" />

@@ -20,5 +20,7 @@ namespace rent_products_api.DataLayer.Utils
         public string SmtpPass { get; set; }
         public string MailBaseUrl { get; set; }
         public string AtvImageUploadPath { get; set; }
+        public string NetopiaSignature { get; set; }
+        public string NetopiaUrl { get; set; }
     }
 }

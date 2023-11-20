@@ -43,7 +43,6 @@ namespace rent_products_api.ServiceLayer.ProductService
                         files.Add(image);
                     }
                 }
-                else return new ServiceResponse<Object> { Response = (string)null, Success = false };
 
                 var product = _mapper.Map<Product>(productDTO);
                 product.Images = files;
@@ -118,6 +117,7 @@ namespace rent_products_api.ServiceLayer.ProductService
             try
             {
                 string fileName = GenericFunctions.GetFileNameHashed(file.FileName);
+
                 fileName = Path.GetFileName(fileName);
                 string uploadpath = Path.Combine(Directory.GetCurrentDirectory(), _appSettings.AtvImageUploadPath, fileName);
 

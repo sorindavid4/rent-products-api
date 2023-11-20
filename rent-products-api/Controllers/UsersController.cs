@@ -134,9 +134,9 @@ namespace rent_products_api.Controllers
         }
 
         [HttpPost("/Users/ForgotPassword")]
-        public async Task<IActionResult> ForgotPassword(string email)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordDTO data)
         {
-            var result = await _userService.ForgotPassword(email, Request.Headers["origin"]);
+            var result = await _userService.ForgotPassword(data.Email, Request.Headers["origin"]);
             if (result.Success)
                 return Ok(result);
             else
@@ -241,6 +241,16 @@ namespace rent_products_api.Controllers
         {
 
             var result = await _userService.SendContactEmail(dto);
+            if (result.Success)
+                return Ok(result);
+            else
+                return BadRequest(result);
+        }
+        [Authorize(UserType.AdminUser)]
+        [HttpGet("/Users/GetUsers")]
+        public async Task<IActionResult> GetUsers()
+        {
+            var result = await _userService.GetUsers();
             if (result.Success)
                 return Ok(result);
             else

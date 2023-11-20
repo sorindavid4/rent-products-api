@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using rent_products_api.DataLayer.DTOs.Payments;
 using rent_products_api.ServiceLayer.PaymentService;
@@ -16,6 +17,7 @@ namespace rent_products_api.Controllers
         {
             _paymentService = paymentService;
         }
+
         [HttpPost("/Payment/GoToPayment")]
         public async Task<IActionResult> GoToPayment([FromBody] GoToPaymentDTO payment)
         {
@@ -24,7 +26,10 @@ namespace rent_products_api.Controllers
             var paymentDTO = new GoToPaymentDTO
             {
                 UserId = Account.UserId,
-                PaymentType = payment.PaymentType
+                PaymentType = payment.PaymentType,
+                Email = payment.Email,
+                RentId = payment.RentId,
+                PhoneNumber = payment.PhoneNumber,
             };
 
             var result = await _paymentService.GoToPayment(paymentDTO, origin);

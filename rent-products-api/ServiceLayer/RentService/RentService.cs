@@ -61,11 +61,11 @@ namespace rent_products_api.ServiceLayer.RentService
                 {
 
                 }
-                return new ServiceResponse<object> { Success = true };
+                return new ServiceResponse<object> { Success = true, Message = Messages.Message_CancelRentSuccess };
             }
             catch(Exception e)
             {
-                return new ServiceResponse<object> { Success = false };
+                return new ServiceResponse<object> { Success = false, Message = Messages.Message_CancelRentError };
             }
         }
 
@@ -109,11 +109,11 @@ namespace rent_products_api.ServiceLayer.RentService
                 {
 
                 }
-                return new ServiceResponse<object> { Success = true };
+                return new ServiceResponse<object> { Success = true, Message = Messages.Message_ConfirmRentSuccess };
             }
             catch (Exception e)
             {
-                return new ServiceResponse<object> { Success = false };
+                return new ServiceResponse<object> { Success = false, Message = Messages.Message_ConfirmRentError };
             }
         }
 
@@ -166,7 +166,7 @@ namespace rent_products_api.ServiceLayer.RentService
 
                 if (userType == UserType.AdminUser)
                 {
-                      rents = _mapper.ProjectTo<RentDTO>(_context.Rents.Where(x=>DateTime.Compare(DateTime.Now,x.RentedDate)<0).OrderBy(x=>x.RentedDate)).ToList();
+                      rents = _mapper.ProjectTo<RentDTO>(_context.Rents.OrderBy(x=>x.RentedDate)).ToList();
                 }
                 else
                 {
@@ -198,6 +198,14 @@ namespace rent_products_api.ServiceLayer.RentService
         {
             try
             {
+                if(rentDTO.RentType == 0)
+                {
+                    return new ServiceResponse<object> { Success = false, Message = Messages.Message_RentProductError };
+                }
+                if (rentDTO.PaymentType == 0)
+                {
+                    return new ServiceResponse<object> { Success = false, Message = Messages.Message_RentProductError };
+                }
                 if (rentDTO.RentedByUserId == Guid.Empty)
                 {
                     return new ServiceResponse<object> { Success = false, Message = Messages.Message_UserNotFound };

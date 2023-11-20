@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Options;
 using MobilpayEncryptDecrypt;
 using rent_products_api.DataLayer.DTOs.Payments;
 using rent_products_api.DataLayer.Models.Payments;
@@ -17,17 +18,20 @@ namespace rent_products_api.ServiceLayer.PaymentService
     {
         private readonly MainDbContext _context;
         private readonly IMapper _mapper;
+        private readonly AppSettings _appSettings;
 
-        public PaymentService(MainDbContext dbContext, IMapper mapper)
+        public PaymentService(MainDbContext dbContext, IMapper mapper, IOptions<AppSettings> appSettings)
         {
             _context = dbContext;
             _mapper = mapper;
+            _appSettings = appSettings.Value;
         }
         public async Task<ServiceResponse<RequestPaymentDTO>> GoToPayment(GoToPaymentDTO paymentDTO, string origin)
         {
             try
             {
                 var userType = _context.Users.Where(x => x.UserId == paymentDTO.UserId).Select(x => x.UserType).FirstOrDefault();
+                var paymentId = _context.Rents.Where(x => x.RentId == paymentDTO.RentId).Select(x => x.PaymentId).FirstOrDefault();
                 MobilpayEncrypt encrypt = new MobilpayEncrypt();
 
                 Mobilpay_Payment_Request_Card card = new Mobilpay_Payment_Request_Card();
@@ -46,16 +50,16 @@ namespace rent_products_api.ServiceLayer.PaymentService
 
                 MobilpayEncryptDecrypt.MobilpayEncryptDecrypt encdecr = new MobilpayEncryptDecrypt.MobilpayEncryptDecrypt();
 
-                card.OrderId = Guid.NewGuid().ToString();
+                card.OrderId = paymentId.ToString();
                 card.Type = "card";
-                //card.Signature = _appSettings.NetopiaSignature;
+                card.Signature = _appSettings.NetopiaSignature;
                 card.Params = new Mobilpay_Payment_ParamsCollection();
 
                 card.Params.Add(userId);
                 card.Params.Add(paymentType);
 
                 url.ConfirmUrl = origin + "/Payment/AddOrUpdatePayment";
-                //url.ReturnUrl = _appSettings.MailBaseUrl + "/plata";
+                url.ReturnUrl = _appSettings.MailBaseUrl + "/plata";
 
                 card.Service = "";
                 card.Url = url;
@@ -63,19 +67,17 @@ namespace rent_products_api.ServiceLayer.PaymentService
 
                 invoice.Amount = 300;
                 invoice.Currency = "RON";
-                invoice.Details = "detalii plata";
+                invoice.Details = "Rezervare ATV";
                 billing.Type = "person";
                 billing.Email = paymentDTO.Email;
-
 
                 ctinfo.Billing = billing;
 
                 invoice.ContactInfo = ctinfo;
 
-
                 card.Invoice = invoice;
                 encrypt.Data = encdecr.GetXmlText(card);
-                encrypt.X509CertificateFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/public.cer");
+                encrypt.X509CertificateFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\public.cer");
                 encdecr.Encrypt(encrypt);
                 System.Collections.Specialized.NameValueCollection coll = new System.Collections.Specialized.NameValueCollection();
                 coll.Add("data", encrypt.EncryptedData);
@@ -85,7 +87,7 @@ namespace rent_products_api.ServiceLayer.PaymentService
                 {
                     Env_Key = coll["env_key"],
                     Data = coll["data"],
-                    //Url = _appSettings.NetopiaUrl,
+                    Url = _appSettings.NetopiaUrl,
                     PaymentType = paymentDTO.PaymentType
                 };
 
@@ -105,8 +107,8 @@ namespace rent_products_api.ServiceLayer.PaymentService
                 MobilpayDecrypt decrypt = new MobilpayDecrypt();
                 decrypt.Data = data;
                 decrypt.EnvelopeKey = env_key;
-                decrypt.PrivateKeyFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/private.key");
-                decrypt.X509CertificateFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources/public.cer");
+                decrypt.PrivateKeyFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\private.key");
+                decrypt.X509CertificateFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\public.cer");
 
                 var card = encdecrypt.BuildCardDecrypt(decrypt);
 
@@ -116,8 +118,6 @@ namespace rent_products_api.ServiceLayer.PaymentService
                 var amount = card.Confirm.Original_Amount;
                 var userId = Guid.Parse(card.Params[0].Value);
                 var paymentType = Enum.Parse<PaymentType>(card.Params[1].Value);
-
-
 
 
                 var paymentLog = _context.Payments.FirstOrDefault(x => x.PaymentId == transactionId);

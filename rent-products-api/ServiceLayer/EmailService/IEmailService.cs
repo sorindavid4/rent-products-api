@@ -15,7 +15,6 @@ namespace rent_products_api.ServiceLayer.EmailService
         void Send(string to, string subject, string html, string from = null);
         void SendVerificationEmail(BaseUser account, string origin);
         void SendPasswordResetEmail(BaseUser account, string origin);
-        void SendAlreadyRegisteredEmail(string email, string origin);
 
         void SendWantedRentEmail(EmailRentDetails rentDetails);
         void SendRentConfirmedEmail(EmailRentDetails rentDetails);
