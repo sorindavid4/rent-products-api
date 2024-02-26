@@ -193,7 +193,6 @@ namespace rent_products_api.ServiceLayer
                     // send already registered error in email to prevent account enumeration
                     return new ServiceResponse<Object> { Response = (string)null, Success = false, Message = Messages.Message_EmailAlreadyUsed };
                 }
-
                 // map model to new account object
                 var account = _mapper.Map<User>(model);
 
@@ -201,19 +200,17 @@ namespace rent_products_api.ServiceLayer
                 account.CreatedAt = GenericFunctions.GetCurrentDateTime();
                 account.VerificationToken = randomTokenString();
                 account.Password = BC.HashPassword(model.Password);
-
                 // save account
                 _context.Users.Add(account);
                 _context.SaveChanges();
 
                 // send email
                 _emailService.SendVerificationEmail(account, origin);
-
                 return new ServiceResponse<Object> { Response = (string)null, Success = true, Message = message };
             }
             catch (Exception e)
             {
-                return new ServiceResponse<Object> { Response = (string)null, Success = false, Message = Messages.Message_UserRegisterError };
+                return new ServiceResponse<Object> { Response = e.StackTrace.ToString(), Success = false, Message = Messages.Message_UserRegisterError };
             }
         }
 
@@ -360,7 +357,7 @@ namespace rent_products_api.ServiceLayer
                     throw new AppException("Invalid token");
 
                 // update password and remove reset token
-                account.Password = BC.HashPassword(model.Password);
+                    account.Password = BC.HashPassword(model.Password);
                 account.PasswordReset = GenericFunctions.GetCurrentDateTime();
                 account.ResetToken = null;
                 account.ResetTokenExpires = null;

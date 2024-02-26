@@ -38,8 +38,7 @@ namespace rent_products_api.ServiceLayer.ProductService
                     foreach (var file in productDTO.Images)
                     {
                         var image = _mapper.Map<ProductImage>(file);
-                        var imagePath = addFileToFileSystem(file);
-                        image.ImagePath = imagePath;
+                        image.Data = getBlobFromFile(file);
                         files.Add(image);
                     }
                 }
@@ -59,7 +58,16 @@ namespace rent_products_api.ServiceLayer.ProductService
             }
         }
 
-        public async Task<ServiceResponse<object>> DeleteProduct(Guid productId)
+        private byte[] getBlobFromFile(IFormFile file)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                file.CopyTo(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+            public async Task<ServiceResponse<object>> DeleteProduct(Guid productId)
         {
             try
             {
@@ -69,10 +77,6 @@ namespace rent_products_api.ServiceLayer.ProductService
                 _context.ProductImages.RemoveRange(product.Images);
 
                 _context.SaveChanges();
-                foreach(var path in product.Images)
-                {
-                    deleteFileFromFileSystem(path.ImagePath);
-                }
 
                 return new ServiceResponse<object> { Success = true, Message = Messages.Message_DeleteProductSuccess };
             }
@@ -110,46 +114,6 @@ namespace rent_products_api.ServiceLayer.ProductService
             {
                 return new ServiceResponse<List<ProductDTO>> { Success = false, Message = Messages.Message_GetProductsError };
             }
-        }
-
-        private string addFileToFileSystem(IFormFile file)
-        {
-            try
-            {
-                string fileName = GenericFunctions.GetFileNameHashed(file.FileName);
-
-                fileName = Path.GetFileName(fileName);
-                string uploadpath = Path.Combine(Directory.GetCurrentDirectory(), _appSettings.AtvImageUploadPath, fileName);
-
-                var stream = new FileStream(uploadpath, FileMode.Create);
-
-                file.CopyTo(stream);
-
-                stream.Close();
-
-                return _appSettings.AtvImageUploadPath + fileName;
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-        }
-
-        private bool deleteFileFromFileSystem(string path)
-        {
-            try
-            {
-                var folders = _appSettings.AtvImageUploadPath.Split("\\");
-
-                var deletePath = Directory.GetCurrentDirectory() + "\\" + path;
-                File.Delete(deletePath);
-                return true;
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-
         }
     }
 }

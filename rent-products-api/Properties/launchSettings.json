@@ -22,14 +22,16 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "applicationUrl": "https://localhost:5001"
+      "applicationUrl": "https://localhost:5001",
+      "useSSL": true
     },
     "rent_products_api_prod": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
       },
-      "applicationUrl": "https://localhost:5001"
+      "applicationUrl": "https://localhost:8080",
+       "useSSL": true
     }
   }
 }

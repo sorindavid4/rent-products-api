@@ -30,7 +30,7 @@ namespace rent_products_api.ServiceLayer.PaymentService
         {
             try
             {
-                var userType = _context.Users.Where(x => x.UserId == paymentDTO.UserId).Select(x => x.UserType).FirstOrDefault();
+                Console.WriteLine(paymentDTO);
                 var paymentId = _context.Rents.Where(x => x.RentId == paymentDTO.RentId).Select(x => x.PaymentId).FirstOrDefault();
                 MobilpayEncrypt encrypt = new MobilpayEncrypt();
 
@@ -77,7 +77,8 @@ namespace rent_products_api.ServiceLayer.PaymentService
 
                 card.Invoice = invoice;
                 encrypt.Data = encdecr.GetXmlText(card);
-                encrypt.X509CertificateFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Resources\\public.cer");
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+                encrypt.X509CertificateFilePath = Path.Combine(path, "public.cer");
                 encdecr.Encrypt(encrypt);
                 System.Collections.Specialized.NameValueCollection coll = new System.Collections.Specialized.NameValueCollection();
                 coll.Add("data", encrypt.EncryptedData);
@@ -95,7 +96,7 @@ namespace rent_products_api.ServiceLayer.PaymentService
             }
             catch (Exception e)
             {
-
+                Console.WriteLine(e.StackTrace.ToString());
                 return new ServiceResponse<RequestPaymentDTO> { Success = false,  };
             }
         }
@@ -121,7 +122,7 @@ namespace rent_products_api.ServiceLayer.PaymentService
 
 
                 var paymentLog = _context.Payments.FirstOrDefault(x => x.PaymentId == transactionId);
-
+                Console.WriteLine(card.ToString());
                 if (paymentLog != null)
                 {
                     //paymentLog.StatusUpdateTime = GenericFunctions.GetCurrentDateTime();
@@ -145,8 +146,8 @@ namespace rent_products_api.ServiceLayer.PaymentService
             }
             catch (Exception e)
             {
-      
-                return new ServiceResponse<object> { Success = false };
+                Console.WriteLine(e.StackTrace.ToString());
+                return new ServiceResponse<object> { Response = e.StackTrace.ToString(), Success = false };
             }
         }
         public async Task<ServiceResponse<List<PaymentDTO>>> GetPayments(Guid userId)

@@ -13,7 +13,7 @@ namespace rent_products_api.ServiceLayer.Utils
     {
         public static DateTime GetCurrentDateTime()
         {
-            return TimeZoneInfo.ConvertTime(DateTime.UtcNow, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time"));
+            return TimeZoneInfo.ConvertTime(DateTime.UtcNow, GetEuropeTimeZone());
         }
 
         public static TimeSpan ParseStringToTimeSpan(string timeAsString)
@@ -43,7 +43,7 @@ namespace rent_products_api.ServiceLayer.Utils
                 {
                     return null;
                 }
-                return TimeZoneInfo.ConvertTimeToUtc(dateTime, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time")).ToString("yyyy-MM-dd HH:mmZ");
+                return TimeZoneInfo.ConvertTimeToUtc(dateTime, GetEuropeTimeZone()).ToString("yyyy-MM-dd HH:mmZ");
             }
 
         }
@@ -55,7 +55,7 @@ namespace rent_products_api.ServiceLayer.Utils
             }
             else
             {
-                DateTime data = TimeZoneInfo.ConvertTimeToUtc((DateTime)dateTime, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time"));
+                DateTime data = TimeZoneInfo.ConvertTimeToUtc((DateTime)dateTime, GetEuropeTimeZone());
                 return data.ToString("yyyy-MM-dd HH:mmZ");
             }
         }
@@ -80,7 +80,7 @@ namespace rent_products_api.ServiceLayer.Utils
                 return null;
             }
             var dateAsDate = Convert.ToDateTime(dateTime).ToUniversalTime();
-            DateTime date = TimeZoneInfo.ConvertTimeFromUtc(dateAsDate, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time"));
+            DateTime date = TimeZoneInfo.ConvertTimeFromUtc(dateAsDate, GetEuropeTimeZone());
             return date;
         }
 
@@ -123,12 +123,24 @@ namespace rent_products_api.ServiceLayer.Utils
         public static DateTime ConvertDateAndTimeUtcToLocal(string utcDateAsString, string utcTimeAsString)
         {
             var utcDate = Convert.ToDateTime(utcDateAsString).ToUniversalTime();
-            var date = TimeZoneInfo.ConvertTimeFromUtc(utcDate, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time"));
+            var date = TimeZoneInfo.ConvertTimeFromUtc(utcDate, GetEuropeTimeZone());
             var utcTime = Convert.ToDateTime(utcTimeAsString).ToUniversalTime();
-            var time = TimeZoneInfo.ConvertTimeFromUtc(utcTime, TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time")).ToString("HH:mm");
+            var time = TimeZoneInfo.ConvertTimeFromUtc(utcTime, GetEuropeTimeZone()).ToString("HH:mm");
             var timeSpan = TimeSpan.Parse(time);
             return new DateTime(date.Year, date.Month, date.Day, timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
 
+        }
+
+        public static TimeZoneInfo GetEuropeTimeZone()
+        {
+            try
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("E. Europe Standard Time");
+            }
+            catch (Exception ex)
+            {
+                return TimeZoneInfo.FindSystemTimeZoneById("Europe/Bucharest");
+            }
         }
     }
 }
